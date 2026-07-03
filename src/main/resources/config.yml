@@ -1,0 +1,38 @@
+# NPCSpeak Configuration
+
+# NPC provider. Options: builtin, citizens
+# "citizens" requires Citizens2 to be installed — falls back to builtin if not present.
+npc-provider: builtin
+
+# AI backend used for NPC conversations.
+# Options: ollama, openai
+backend: ollama
+
+# Ollama settings (used when backend: ollama)
+# Install Ollama: https://ollama.com/
+ollama:
+  # URL of the Ollama server (default: local)
+  url: http://localhost:11434
+  # Model to use — run "ollama pull llama3" first
+  model: llama3
+  # Seconds to wait for a response before giving up
+  timeout-seconds: 60
+
+# OpenAI-compatible settings (used when backend: openai)
+# Works with: OpenAI, Groq, LM Studio, vLLM, Anthropic, and any OpenAI-compatible API
+openai:
+  # API endpoint. Change for local servers (e.g. http://localhost:1234 for LM Studio)
+  url: https://api.openai.com
+  # Your API key. Leave blank for local servers that don't require auth.
+  api-key: ""
+  # Model to use
+  model: gpt-4o-mini
+
+# Conversation settings
+conversation:
+  # Max back-and-forth exchanges kept in memory per player per NPC
+  max-exchanges: 10
+  # Seconds a player must wait between sending messages to the same NPC
+  cooldown-seconds: 3
+  # Seconds of inactivity before the conversation auto-closes
+  listen-timeout-seconds: 60

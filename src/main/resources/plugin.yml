@@ -1,0 +1,25 @@
+name: NPCSpeak
+version: '${version}'
+
+main: com.l299l.npcspeak.NPCSpeak
+paperPluginLoader: com.l299l.npcspeak.NPCSpeakLoader
+api-version: '1.20'
+load: POSTWORLD
+
+authors: [ l299l ]
+soft-depend: [ Citizens ]
+
+commands:
+  npcspeak:
+    description: Manage NPCSpeak NPCs
+    usage: /npcspeak <spawn|remove|list|info|edit|task|reload> [args]
+    aliases: [ npc ]
+    permission: npcspeak.admin
+
+permissions:
+  npcspeak.admin:
+    description: Manage NPCSpeak NPCs (spawn, remove, reload)
+    default: op
+  npcspeak.interact:
+    description: Interact with NPCSpeak NPCs
+    default: true

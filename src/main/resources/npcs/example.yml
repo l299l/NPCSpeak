@@ -1,0 +1,31 @@
+# NPCSpeak — Example NPC config
+# Copy this file, rename it to <id>.yml, fill in the location, and reload.
+# All "personality" fields are optional — sensible defaults apply.
+
+display-name: "Example NPC"
+
+# Entity UUID is written automatically by the plugin on first spawn.
+# Leave it out when creating a new NPC manually; the plugin fills it in.
+# entity-uuid: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+
+location:
+  world: world
+  x: 0.5
+  y: 64.0
+  z: 0.5
+  yaw: 0.0
+  pitch: 0.0
+
+personality:
+  # What the NPC says when a player first right-clicks it
+  greeting: "Greetings, traveler! How can I help you?"
+
+  # Free-form system prompt appended after the generated preamble.
+  # Use this for backstory, speech style, and quirks.
+  system-prompt: "You speak in a calm, wise tone and know many ancient secrets."
+
+  # Topics the NPC focuses on (helps the AI stay on theme)
+  topic: "history, ancient ruins, forgotten lore"
+
+  # Topics the NPC actively avoids
+  avoid: "modern technology, real-world politics"
