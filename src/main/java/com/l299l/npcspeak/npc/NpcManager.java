@@ -45,7 +45,7 @@ public class NpcManager {
         byId.put(data.getId(), data);
         provider.restoreOrSpawn(data);
         trackEntityUUID(data);
-        configLoader.save(data); // re-save with updated UUID / citizensId
+        configLoader.save(data);
     }
 
     public void remove(String id) {

@@ -7,6 +7,5 @@ class NPCSpeakLoader implements PluginLoader {
 
     @Override
     public void classloader(final PluginClasspathBuilder builder) {
-        // Add dynamically loaded libraries here
     }
 }

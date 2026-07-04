@@ -63,15 +63,22 @@ public class NpcData {
             config.setSystemPrompt(yaml.getString("personality.system-prompt"));
             config.setTopic(yaml.getString("personality.topic"));
             config.setAvoid(yaml.getString("personality.avoid"));
+            if (yaml.isSet("personality.memory-enabled"))
+                config.setMemoryEnabled(yaml.getBoolean("personality.memory-enabled"));
+            config.setMaxInteractions(yaml.getInt("personality.max-interactions", -1));
+            config.setLockAfterTask(yaml.getBoolean("personality.lock-after-task", false));
+            config.setLogConversations(yaml.getBoolean("personality.log-conversations", false));
             if (yaml.isConfigurationSection("personality.task")) {
                 NpcTaskConfig task = new NpcTaskConfig();
                 task.setType(yaml.getString("personality.task.type", "freeform"));
                 task.setGoal(yaml.getString("personality.task.goal"));
                 task.setOutcomeCheck(yaml.getString("personality.task.outcome-check"));
+                task.setRequire(yaml.getStringList("personality.task.require"));
                 task.setOnSuccess(yaml.getStringList("personality.task.on-success"));
                 task.setOnFailure(yaml.getStringList("personality.task.on-failure"));
                 task.setMaxExchanges(yaml.getInt("personality.task.max-exchanges", -1));
                 task.setDifficulty(yaml.getInt("personality.task.difficulty", 3));
+                task.setIntelligentQuantity(yaml.getBoolean("personality.task.intelligent-quantity", false));
                 config.setTask(task);
             }
         }
@@ -99,15 +106,21 @@ public class NpcData {
             yaml.set("personality.system-prompt", config.getSystemPrompt() != null ? config.getSystemPrompt() : "");
             yaml.set("personality.topic", config.getTopic() != null ? config.getTopic() : "");
             yaml.set("personality.avoid", config.getAvoid() != null ? config.getAvoid() : "");
+            yaml.set("personality.memory-enabled", config.getMemoryEnabled());
+            yaml.set("personality.max-interactions", config.getMaxInteractions());
+            yaml.set("personality.lock-after-task", config.isLockAfterTask());
+            if (config.isLogConversations()) yaml.set("personality.log-conversations", true);
             NpcTaskConfig task = config.getTask();
             if (task != null) {
                 yaml.set("personality.task.type", task.getType());
                 yaml.set("personality.task.goal", task.getGoal());
                 yaml.set("personality.task.outcome-check", task.getOutcomeCheck());
+                yaml.set("personality.task.require", task.getRequire().isEmpty() ? null : task.getRequire());
                 yaml.set("personality.task.on-success", task.getOnSuccess());
                 yaml.set("personality.task.on-failure", task.getOnFailure());
                 yaml.set("personality.task.max-exchanges", task.getMaxExchanges() > 0 ? task.getMaxExchanges() : null);
                 yaml.set("personality.task.difficulty", task.getDifficulty());
+                yaml.set("personality.task.intelligent-quantity", task.isIntelligentQuantity());
             } else {
                 yaml.set("personality.task", null);
             }

@@ -7,12 +7,12 @@ api-version: '1.20'
 load: POSTWORLD
 
 authors: [ l299l ]
-soft-depend: [ Citizens ]
+soft-depend: [ Citizens, PlaceholderAPI, Vault ]
 
 commands:
   npcspeak:
     description: Manage NPCSpeak NPCs
-    usage: /npcspeak <spawn|remove|list|info|edit|task|reload> [args]
+    usage: /npcspeak <spawn|remove|list|info|edit|task|example|memory|log|reload> [args]
     aliases: [ npc ]
     permission: npcspeak.admin
 

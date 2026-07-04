@@ -6,9 +6,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class TaskManager {
 
-    // player UUID → (npc id → task state)
     private final Map<UUID, Map<String, TaskState>> stateMap = new ConcurrentHashMap<>();
-    // player UUID → (npc id → exchanges completed against this task)
     private final Map<UUID, Map<String, Integer>> exchangeCount = new ConcurrentHashMap<>();
 
     public TaskState getState(UUID playerId, String npcId) {
@@ -20,11 +18,17 @@ public class TaskManager {
         stateMap.computeIfAbsent(playerId, k -> new ConcurrentHashMap<>()).put(npcId, state);
     }
 
-    /** Increments and returns the new exchange count for this player+NPC task. */
     public int incrementExchanges(UUID playerId, String npcId) {
         return exchangeCount
                 .computeIfAbsent(playerId, k -> new ConcurrentHashMap<>())
                 .merge(npcId, 1, Integer::sum);
+    }
+
+    public void clearNpc(UUID playerId, String npcId) {
+        Map<String, TaskState> states = stateMap.get(playerId);
+        if (states != null) states.remove(npcId);
+        Map<String, Integer> counts = exchangeCount.get(playerId);
+        if (counts != null) counts.remove(npcId);
     }
 
     public void clearPlayer(UUID playerId) {

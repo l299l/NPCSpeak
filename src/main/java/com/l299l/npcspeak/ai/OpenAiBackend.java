@@ -12,6 +12,7 @@ import java.net.http.HttpResponse;
 import java.time.Duration;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Consumer;
 
 public class OpenAiBackend implements AiBackend {
 
@@ -37,7 +38,6 @@ public class OpenAiBackend implements AiBackend {
                 .POST(HttpRequest.BodyPublishers.ofString(buildBody(messages)))
                 .timeout(Duration.ofSeconds(timeoutSeconds));
 
-        // Authorization header is optional — local servers (LM Studio, vLLM) often don't need it
         if (!apiKey.isBlank()) {
             builder.header("Authorization", "Bearer " + apiKey);
         }
@@ -52,9 +52,52 @@ public class OpenAiBackend implements AiBackend {
                 });
     }
 
+    @Override
+    public CompletableFuture<String> streamComplete(List<AiMessage> messages, Consumer<String> onToken) {
+        HttpRequest.Builder builder = HttpRequest.newBuilder()
+                .uri(URI.create(url + "/v1/chat/completions"))
+                .header("Content-Type", "application/json")
+                .POST(HttpRequest.BodyPublishers.ofString(buildBody(messages, true)));
+
+        if (!apiKey.isBlank()) builder.header("Authorization", "Bearer " + apiKey);
+
+        return httpClient.sendAsync(builder.build(), HttpResponse.BodyHandlers.ofLines())
+                .thenApply(response -> {
+                    if (response.statusCode() != 200) {
+                        throw new RuntimeException("OpenAI-compatible API returned HTTP " + response.statusCode());
+                    }
+                    StringBuilder full = new StringBuilder();
+                    response.body().forEach(line -> {
+                        if (!line.startsWith("data: ")) return;
+                        String data = line.substring(6);
+                        if ("[DONE]".equals(data)) return;
+                        try {
+                            JsonObject delta = JsonParser.parseString(data)
+                                    .getAsJsonObject()
+                                    .getAsJsonArray("choices")
+                                    .get(0).getAsJsonObject()
+                                    .getAsJsonObject("delta");
+                            if (delta.has("content")) {
+                                String token = delta.get("content").getAsString();
+                                if (!token.isEmpty()) {
+                                    onToken.accept(token);
+                                    full.append(token);
+                                }
+                            }
+                        } catch (Exception ignored) {}
+                    });
+                    return full.toString().trim();
+                });
+    }
+
     private String buildBody(List<AiMessage> messages) {
+        return buildBody(messages, false);
+    }
+
+    private String buildBody(List<AiMessage> messages, boolean stream) {
         JsonObject body = new JsonObject();
         body.addProperty("model", model);
+        if (stream) body.addProperty("stream", true);
         JsonArray arr = new JsonArray();
         for (AiMessage msg : messages) {
             JsonObject m = new JsonObject();

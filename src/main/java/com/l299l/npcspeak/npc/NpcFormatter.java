@@ -1,6 +1,8 @@
 package com.l299l.npcspeak.npc;
 
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.event.ClickEvent;
+import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
 
@@ -46,6 +48,26 @@ public final class NpcFormatter {
 
     public static void sendTaskFailed(Player player, String npcName) {
         player.sendMessage(Component.text("[ Task failed ]", NamedTextColor.RED));
+    }
+
+    public static void sendNegotiateButtons(Player player) {
+        Component accept = Component.text("[✓ Accept]", NamedTextColor.GREEN)
+                .clickEvent(ClickEvent.runCommand("/npcspeak accept"))
+                .hoverEvent(HoverEvent.showText(Component.text("Accept the current offer", NamedTextColor.GREEN)));
+        Component decline = Component.text("[✗ Decline]", NamedTextColor.RED)
+                .clickEvent(ClickEvent.runCommand("/npcspeak decline"))
+                .hoverEvent(HoverEvent.showText(Component.text("Decline the current offer", NamedTextColor.RED)));
+        player.sendMessage(Component.text("  ").append(accept).append(Component.text("  ")).append(decline));
+    }
+
+    public static void sendRequirementsFailed(Player player, String npcName) {
+        player.sendMessage(prefix(npcName)
+                .append(Component.text("You don't have the required items or funds.", NamedTextColor.RED)));
+    }
+
+    public static void sendInteractionBlocked(Player player, String npcName) {
+        player.sendMessage(prefix(npcName)
+                .append(Component.text("I have nothing more to say to you.", NamedTextColor.GRAY)));
     }
 
     public static void sendError(Player player, String npcName, String backendName) {

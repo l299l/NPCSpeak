@@ -16,7 +16,6 @@ public class CooldownManager {
         return System.currentTimeMillis() - last < cooldownMs;
     }
 
-    /** Returns remaining cooldown in whole seconds (always >= 1 when on cooldown). */
     public long remainingSeconds(UUID playerId, String npcId, long cooldownMs) {
         Map<String, Long> playerMap = lastMessage.get(playerId);
         if (playerMap == null) return 0;

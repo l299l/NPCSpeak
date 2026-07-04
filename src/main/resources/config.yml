@@ -1,38 +1,44 @@
-# NPCSpeak Configuration
-
-# NPC provider. Options: builtin, citizens
-# "citizens" requires Citizens2 to be installed — falls back to builtin if not present.
+# Which NPC provider to use: builtin (villager entities) or citizens (Citizens2 plugin)
 npc-provider: builtin
 
-# AI backend used for NPC conversations.
-# Options: ollama, openai
+# AI backend to use: ollama or openai
 backend: ollama
 
-# Ollama settings (used when backend: ollama)
-# Install Ollama: https://ollama.com/
 ollama:
-  # URL of the Ollama server (default: local)
   url: http://localhost:11434
-  # Model to use — run "ollama pull llama3" first
   model: llama3
-  # Seconds to wait for a response before giving up
+  # Maximum seconds to wait for a response before giving up
   timeout-seconds: 60
 
-# OpenAI-compatible settings (used when backend: openai)
-# Works with: OpenAI, Groq, LM Studio, vLLM, Anthropic, and any OpenAI-compatible API
 openai:
-  # API endpoint. Change for local servers (e.g. http://localhost:1234 for LM Studio)
+  # Base URL — change this for local OpenAI-compatible servers (LM Studio, Groq, vLLM, etc.)
   url: https://api.openai.com
-  # Your API key. Leave blank for local servers that don't require auth.
+  # API key — leave blank for keyless local servers
   api-key: ""
-  # Model to use
   model: gpt-4o-mini
 
-# Conversation settings
+# Stream tokens to the action bar as they arrive, then print the full reply in chat
+streaming: false
+
+moderation:
+  enabled: false
+  # Messages containing any of these phrases (case-insensitive) are blocked
+  blocked-phrases: []
+  # What the NPC says when a message is blocked
+  blocked-response: "I cannot discuss that topic."
+  # Optional Discord webhook URL — fires an alert embed when a message is blocked
+  discord-webhook: ""
+
+memory:
+  # Generate a short memory summary after each conversation and inject it on the next visit
+  enabled: true
+  # Memories older than this many days are ignored
+  max-age-days: 30
+
 conversation:
-  # Max back-and-forth exchanges kept in memory per player per NPC
+  # Maximum player messages per conversation (safety cap; tasks can also set their own limit)
   max-exchanges: 10
-  # Seconds a player must wait between sending messages to the same NPC
+  # Seconds a player must wait between messages to the same NPC
   cooldown-seconds: 3
-  # Seconds of inactivity before the conversation auto-closes
+  # Seconds of silence before the conversation times out and ends automatically
   listen-timeout-seconds: 60

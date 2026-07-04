@@ -4,11 +4,13 @@ import com.l299l.npcspeak.ai.AiBackend;
 import com.l299l.npcspeak.ai.BackendFactory;
 import com.l299l.npcspeak.command.NpcCommand;
 import com.l299l.npcspeak.command.NpcCommandCompleter;
+import com.l299l.npcspeak.config.ModerationConfig;
 import com.l299l.npcspeak.config.PluginConfig;
 import com.l299l.npcspeak.conversation.ConversationListener;
 import com.l299l.npcspeak.conversation.ConversationManager;
 import com.l299l.npcspeak.conversation.TaskManager;
 import com.l299l.npcspeak.cooldown.CooldownManager;
+import com.l299l.npcspeak.logging.ConversationLogger;
 import com.l299l.npcspeak.npc.BuiltinNpcProvider;
 import com.l299l.npcspeak.npc.CitizensNpcListener;
 import com.l299l.npcspeak.npc.CitizensNpcProvider;
@@ -16,6 +18,10 @@ import com.l299l.npcspeak.npc.NPCSpeakTrait;
 import com.l299l.npcspeak.npc.NpcListener;
 import com.l299l.npcspeak.npc.NpcManager;
 import com.l299l.npcspeak.npc.NpcProvider;
+import com.l299l.npcspeak.memory.NpcMemoryManager;
+import com.l299l.npcspeak.papi.NpcSpeakExpansion;
+import com.l299l.npcspeak.papi.PapiExpander;
+import com.l299l.npcspeak.vault.VaultHook;
 import net.citizensnpcs.api.CitizensAPI;
 import net.citizensnpcs.api.trait.TraitInfo;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -40,8 +46,26 @@ public final class NPCSpeak extends JavaPlugin {
             return;
         }
 
+        NpcMemoryManager memoryManager = new NpcMemoryManager(getDataFolder());
+        boolean memorySummaryEnabled = pluginConfig.isMemoryEnabled();
+        if (memorySummaryEnabled) {
+            getLogger().info("NPC memory enabled (max-age: " + pluginConfig.getMemoryMaxAgeDays() + " days).");
+        }
+
+        boolean streamingEnabled = pluginConfig.isStreamingEnabled();
+        if (streamingEnabled) getLogger().info("Streaming mode enabled.");
+
+        ModerationConfig moderation = pluginConfig.getModerationConfig();
+        if (moderation.enabled()) getLogger().info("Content moderation enabled.");
+
+        ConversationLogger conversationLogger = new ConversationLogger(getDataFolder(), moderation.discordWebhook());
+
+        VaultHook vault = VaultHook.init(this);
+
         conversationManager = new ConversationManager(
                 this, backend, new CooldownManager(), new TaskManager(),
+                memoryManager, memorySummaryEnabled, pluginConfig.getMemoryMaxAgeDays(),
+                streamingEnabled, moderation, conversationLogger, vault,
                 pluginConfig.getMaxConversationExchanges(),
                 pluginConfig.getCooldownSeconds(),
                 pluginConfig.getListenTimeoutSeconds()
@@ -59,9 +83,14 @@ public final class NPCSpeak extends JavaPlugin {
                     new CitizensNpcListener(npcManager, conversationManager), this);
         }
 
-        NpcCommand npcCommand = new NpcCommand(npcManager);
+        NpcCommand npcCommand = new NpcCommand(npcManager, memoryManager, conversationManager, conversationLogger);
         getCommand("npcspeak").setExecutor(npcCommand);
         getCommand("npcspeak").setTabCompleter(new NpcCommandCompleter(npcManager));
+
+        PapiExpander.init(this);
+        if (PapiExpander.isAvailable()) {
+            new NpcSpeakExpansion(conversationManager, getPluginMeta().getVersion()).register();
+        }
 
         getLogger().info("Enabled with " + npcManager.count() + " NPC(s) loaded (provider: " + provider.getName() + ").");
     }

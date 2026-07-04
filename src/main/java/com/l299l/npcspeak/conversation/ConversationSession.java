@@ -29,6 +29,10 @@ public class ConversationSession {
         return new ArrayList<>(history);
     }
 
+    public synchronized int getExchangeCount() {
+        return history.size() / 2;
+    }
+
     public boolean isPending() { return pending; }
     public void setPending(boolean pending) { this.pending = pending; }
 }
