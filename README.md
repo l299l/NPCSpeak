@@ -238,4 +238,12 @@ Coming soon!
 
 ## License
 
-MIT
+See LICENSE.txt
+
+---
+
+<div align="center">
+
+**NPCSpeak v1.0** — Developed by **l299l** — Paper 1.20 – 26.2
+
+</div>
