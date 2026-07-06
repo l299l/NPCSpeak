@@ -14,6 +14,7 @@ public class NpcTaskConfig {
     private int maxExchanges = -1;
     private int difficulty = 3;
     private boolean intelligentQuantity = false;
+    private boolean showButtons = true;
 
     public boolean isEvaluatable() {
         return !"freeform".equalsIgnoreCase(type)
@@ -40,4 +41,6 @@ public class NpcTaskConfig {
     public void setDifficulty(int difficulty) { this.difficulty = Math.max(1, Math.min(5, difficulty)); }
     public boolean isIntelligentQuantity() { return intelligentQuantity; }
     public void setIntelligentQuantity(boolean intelligentQuantity) { this.intelligentQuantity = intelligentQuantity; }
+    public boolean isShowButtons() { return showButtons; }
+    public void setShowButtons(boolean showButtons) { this.showButtons = showButtons; }
 }

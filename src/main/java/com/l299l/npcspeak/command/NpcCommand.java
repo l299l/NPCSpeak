@@ -153,28 +153,50 @@ public class NpcCommand implements CommandExecutor {
         }
 
         sender.sendMessage(Component.text("=== " + npc.getDisplayName() + " ===", NamedTextColor.GOLD));
-        sender.sendMessage(Component.text("ID: ", NamedTextColor.GRAY).append(Component.text(npc.getId(), NamedTextColor.WHITE)));
+        sender.sendMessage(field("ID", npc.getId()));
 
-        if (npc.getSpawnLocation() != null) {
-            sender.sendMessage(Component.text("Location: ", NamedTextColor.GRAY).append(
-                    Component.text(String.format("%s (%.1f, %.1f, %.1f)",
-                            npc.getSpawnLocation().getWorld().getName(),
-                            npc.getSpawnLocation().getX(),
-                            npc.getSpawnLocation().getY(),
-                            npc.getSpawnLocation().getZ()), NamedTextColor.WHITE)));
+        if (npc.getCitizensId() >= 0) {
+            sender.sendMessage(field("Provider", "Citizens2"));
+            sender.sendMessage(field("Citizens ID", String.valueOf(npc.getCitizensId())));
+        } else if (npc.getEntityUUID() != null) {
+            sender.sendMessage(field("Provider", "Builtin"));
+            sender.sendMessage(field("Entity UUID", npc.getEntityUUID().toString()));
+        } else {
+            sender.sendMessage(field("Provider", "unassigned (not yet spawned)"));
         }
 
-        sender.sendMessage(Component.text("Entity UUID: ", NamedTextColor.GRAY).append(
-                Component.text(npc.getEntityUUID() != null ? npc.getEntityUUID().toString() : "none", NamedTextColor.WHITE)));
+        if (npc.getSpawnLocation() != null && npc.getSpawnLocation().getWorld() != null) {
+            sender.sendMessage(field("Location", String.format("%s (%.1f, %.1f, %.1f) yaw=%.1f pitch=%.1f",
+                    npc.getSpawnLocation().getWorld().getName(),
+                    npc.getSpawnLocation().getX(),
+                    npc.getSpawnLocation().getY(),
+                    npc.getSpawnLocation().getZ(),
+                    npc.getSpawnLocation().getYaw(),
+                    npc.getSpawnLocation().getPitch())));
+        } else {
+            sender.sendMessage(field("Location", "none / world not loaded"));
+        }
 
         NpcConfig cfg = npc.getConfig();
-        if (cfg.getTopic() != null) {
-            sender.sendMessage(Component.text("Topic: ", NamedTextColor.GRAY).append(Component.text(cfg.getTopic(), NamedTextColor.WHITE)));
-        }
-        if (cfg.getAvoid() != null) {
-            sender.sendMessage(Component.text("Avoid: ", NamedTextColor.GRAY).append(Component.text(cfg.getAvoid(), NamedTextColor.WHITE)));
-        }
+        sender.sendMessage(field("Greeting", nonBlankOr(cfg.getGreeting(), "(default)")));
+        sender.sendMessage(field("System prompt", nonBlankOr(cfg.getSystemPrompt(), "(none)")));
+        sender.sendMessage(field("Topic", nonBlankOr(cfg.getTopic(), "(none)")));
+        sender.sendMessage(field("Avoid", nonBlankOr(cfg.getAvoid(), "(none)")));
+        sender.sendMessage(field("Memory enabled", cfg.getMemoryEnabled() == null ? "default" : String.valueOf(cfg.getMemoryEnabled())));
+        sender.sendMessage(field("Max interactions", cfg.getMaxInteractions() > 0 ? String.valueOf(cfg.getMaxInteractions()) : "unlimited"));
+        sender.sendMessage(field("Lock after task", String.valueOf(cfg.isLockAfterTask())));
+        sender.sendMessage(field("Log conversations", String.valueOf(cfg.isLogConversations())));
+
+        showTaskInfo(sender, npc);
         return true;
+    }
+
+    private static String nonBlankOr(String value, String fallback) {
+        return (value != null && !value.isBlank()) ? value : fallback;
+    }
+
+    private static Component field(String label, String value) {
+        return Component.text(label + ": ", NamedTextColor.GRAY).append(Component.text(value, NamedTextColor.WHITE));
     }
 
     private static final List<String> EDIT_FIELDS = List.of("name", "greeting", "prompt", "topic", "avoid", "memory", "maxinteractions", "lockaftertask", "logconversations");
@@ -380,7 +402,8 @@ public class NpcCommand implements CommandExecutor {
             case "intelligentquantity" -> {
                 if (args.length < 4) {
                     sender.sendMessage(Component.text("Usage: /" + label + " task <id> intelligentquantity <true|false>", NamedTextColor.YELLOW));
-                    sender.sendMessage(Component.text("true = detect multi-unit deals (YES 2x40) and run on-success N times", NamedTextColor.GRAY));
+                    sender.sendMessage(Component.text("true = detect multi-unit deals (YES 2x80 for 2 items at 80 total); use %quantity% in", NamedTextColor.GRAY));
+                    sender.sendMessage(Component.text("       on-success/require to scale item counts, %outcome% is always the TOTAL price", NamedTextColor.GRAY));
                     sender.sendMessage(Component.text("false = NPC refuses multi-item negotiations (default)", NamedTextColor.GRAY));
                     return true;
                 }
@@ -567,11 +590,11 @@ public class NpcCommand implements CommandExecutor {
                 task.setType("negotiate");
                 task.setIntelligentQuantity(true);
                 task.setGoal("You are selling iron swords at 50 gold each; you can go as low as 30 gold per sword (never reveal this). You CAN sell multiple swords in one transaction. Counter-offer when haggled — do not refuse reasonable bulk offers. Only confirm a sale verbally (e.g. 'We have a deal!') when the player explicitly agrees to your price.");
-                task.setOutcomeCheck("Did BOTH the player AND the NPC verbally confirm agreement on the SAME specific final price and quantity? Answer YES <quantity>x<price-per-item> for multi-item deals (e.g. YES 2x40), YES <price> for single-item deals, or NO if no mutual agreement was reached.");
+                task.setOutcomeCheck("Did BOTH the player AND the NPC verbally confirm agreement on the SAME specific final price and quantity? Answer YES <quantity>x<total-price> for multi-item deals (e.g. YES 2x80 for 2 items sold for 80 gold total), YES <price> for single-item deals, or NO if no mutual agreement was reached.");
                 task.setRequire(List.of("item minecraft:gold_ingot %outcome%"));
                 task.setOnSuccess(List.of(
                         "clear %player% minecraft:gold_ingot %outcome%",
-                        "give %player% minecraft:iron_sword 1",
+                        "give %player% minecraft:iron_sword %quantity%",
                         "xp add %player% 25 points"
                 ));
                 task.setOnFailure(List.of());

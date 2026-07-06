@@ -12,10 +12,11 @@ ollama:
 
 openai:
   # Base URL — change this for local OpenAI-compatible servers (LM Studio, Groq, vLLM, etc.)
-  url: https://api.openai.com
-  # API key — leave blank for keyless local servers
+  # Currently pointed at Groq's free OpenAI-compatible endpoint
+  url: https://api.groq.com/openai/v1
+  # API key — get one free at https://console.groq.com/keys, no credit card required
   api-key: ""
-  model: gpt-4o-mini
+  model: llama-3.3-70b-versatile
 
 # Stream tokens to the action bar as they arrive, then print the full reply in chat
 streaming: false

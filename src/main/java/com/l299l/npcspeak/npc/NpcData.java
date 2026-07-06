@@ -79,6 +79,7 @@ public class NpcData {
                 task.setMaxExchanges(yaml.getInt("personality.task.max-exchanges", -1));
                 task.setDifficulty(yaml.getInt("personality.task.difficulty", 3));
                 task.setIntelligentQuantity(yaml.getBoolean("personality.task.intelligent-quantity", false));
+                task.setShowButtons(yaml.getBoolean("personality.task.show-buttons", true));
                 config.setTask(task);
             }
         }
@@ -121,6 +122,7 @@ public class NpcData {
                 yaml.set("personality.task.max-exchanges", task.getMaxExchanges() > 0 ? task.getMaxExchanges() : null);
                 yaml.set("personality.task.difficulty", task.getDifficulty());
                 yaml.set("personality.task.intelligent-quantity", task.isIntelligentQuantity());
+                yaml.set("personality.task.show-buttons", task.isShowButtons());
             } else {
                 yaml.set("personality.task", null);
             }
