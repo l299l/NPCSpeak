@@ -1,6 +1,6 @@
 # NPCSpeak
 
-A Paper 1.20 plugin that gives your NPCs real conversations, powered by a language model of your choice: a local Ollama install or any OpenAI-compatible API. Players walk up, right-click, and type. The NPC actually answers, in character, instead of cycling through three canned lines.
+A Paper 1.20+ plugin that gives your NPCs real conversations, powered by a language model of your choice: a local Ollama install or any OpenAI-compatible API. Players walk up, right-click, and type. The NPC actually answers, in character, instead of cycling through three canned lines.
 
 That alone is a nice trick. What makes it worth building a server around is the **task system**: NPCs that aren't just chatty, but actually want something from the player, and only reward them once they've genuinely gotten it.
 
@@ -49,7 +49,7 @@ Every one of these remembers the player, too. At the end of a conversation, the 
 
 ## Requirements
 
-- Paper 1.20 (or a fork of it)
+- Paper 1.20-26.2
 - Java 17 or newer
 - A language model to talk to: Ollama running locally is free and works well, or any OpenAI-compatible endpoint if you'd rather use a hosted one
 
@@ -173,9 +173,12 @@ ollama:
   timeout-seconds: 60
 
 openai:
-  url: https://api.openai.com   # or any compatible endpoint
+  # Base URL — change this for local OpenAI-compatible servers (LM Studio, Groq, vLLM, etc.)
+  # Currently pointed at Groq's free OpenAI-compatible endpoint
+  url: https://api.groq.com/openai/v1
+  # API key — get one free at https://console.groq.com/keys, no credit card required
   api-key: ""
-  model: gpt-4o-mini
+  model: llama-3.3-70b-versatile
 
 streaming: false   # true = stream tokens to the action bar as they arrive
 
@@ -217,9 +220,11 @@ We'd recommend running this alongside Citizens2 if you can. Built-in villager NP
 
 ---
 
-## Suggested screenshots
+## Screenshots
 
-If you're maintaining this page and want to show the plugin off, these are the moments that sell it best:
+Coming soon!
+
+<!-- If you're maintaining this page and want to show the plugin off, these are the moments that sell it best:
 
 1. **A conversation in progress.** The gold `[Merchant Bob]` prefix, a clearly contextual NPC response (not something generic), and the player's messages above it.
 2. **Accept / Decline buttons.** Right after a negotiate NPC proposes a concrete price, with the two clickable buttons underneath its response.
@@ -227,10 +232,18 @@ If you're maintaining this page and want to show the plugin off, these are the m
 4. **A task failure.** The red `[ Task failed ]` line after a player gives up mid-negotiation or gets caught in a lie.
 5. **`/npcspeak info <id>`.** Showing the full breakdown for one NPC: provider, location, personality, and task config together.
 6. **A town scene.** Several different NPC types (merchant, guard captain, wizard) visible at once with their nametags, to show this living in a real server rather than a test world.
-7. **Memory in action.** An NPC referencing something from a previous conversation ("Ah, you're back! Did you ever find a use for that sword?").
+7. **Memory in action.** An NPC referencing something from a previous conversation ("Ah, you're back! Did you ever find a use for that sword?").  -->
 
 ---
 
 ## License
 
-MIT
+See LICENSE.txt
+
+---
+
+<div align="center">
+
+**NPCSpeak v1.0** — Developed by **l299l** — Paper 1.20 – 26.2
+
+</div>
