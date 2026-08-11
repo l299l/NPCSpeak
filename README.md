@@ -1,4 +1,5 @@
 <div align="center">
+   
 [![Modrinth](https://img.shields.io/badge/Modrinth-Download-1BD96A?style=for-the-badge&logo=modrinth&logoColor=white)](https://modrinth.com/plugin/npcspeak)
 
 </div>
