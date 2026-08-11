@@ -1,8 +1,5 @@
 <div align="center">
-   
-[![SpigotMC](https://img.shields.io/badge/SpigotMC-Download-ED8106?style=for-the-badge&logo=data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==)](https://www.spigotmc.org/resources/)
 [![Modrinth](https://img.shields.io/badge/Modrinth-Download-1BD96A?style=for-the-badge&logo=modrinth&logoColor=white)](https://modrinth.com/plugin/npcspeak)
-[![Hangar](https://img.shields.io/badge/Hangar-Download-0EA5E9?style=for-the-badge)](https://hangar.papermc.io/l299l/NPCSpeak)
 
 </div>
 
